@@ -1,0 +1,60 @@
+﻿@page
+@model MinimalRestDemo.Pages.Users.UserIndexModel
+@{
+    ViewData["Title"] = "Users Page";
+}
+
+<form id="user-form" action="/users" method="POST">
+    Name: <input type="text" name="name" value="Niklas" />
+    Email: <input type="text" name="email" value="x@x.x" />
+</form>
+
+<button class="btn btn-primary" id="post-user">Post Users</button>
+
+<button class="btn btn-primary" id="get-users">Get Users</button>
+
+<ul class="mt-3" id="user-list"></ul>
+
+@section Scripts
+{
+<script>
+    const userList = document.getElementById("user-list");
+    const getAll = document.getElementById("get-users");
+    const postUser = document.getElementById("post-user");
+
+    getAll.addEventListener('click',
+        () => {
+            showUsers();
+        });
+
+    postUser.addEventListener('click', () => {
+        const form = document.getElementById("user-form").elements;
+        const user = { name: form.namedItem("name").value, email: form.namedItem("email").value};
+        postData("/users", user);
+    });
+
+    const showUsers = () => {
+        userList.innerHTML = '';
+        fetch("/users")
+            .then(response => response.json())
+            .then(data => {
+                for (let i = 0; i < data.length; i++) {
+                    const li = document.createElement("li");
+                    li.innerText = `${data[i].name} ${data[i].email}`;
+                    userList.appendChild(li);
+                }
+            });
+    }
+
+    const postData = (url = '',data = {}) => {
+        fetch(url,
+                {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+    }
+</script>
+}
